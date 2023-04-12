@@ -1,22 +1,26 @@
 <script setup lang="ts">
-    import { ref } from "vue";
-    import { TicTacToeBox } from "../models/TicTacToeBox";
+import { ref } from "vue";
+import { TicTacToeBox } from "../models/TicTacToeBox";
 
-    const tictactoeBoxes = ref<TicTacToeBox[]>([]);
-    for (let i = 0; i < 9; i++) {
-        tictactoeBoxes.value.push(new TicTacToeBox(false, ""));
-    }
-    const placeMarker = (i: number) => {
-        tictactoeBoxes.value[i].marked = true;
-        tictactoeBoxes.value[i].marker = "o";
-        console.log(tictactoeBoxes.value[i])
-    }
+const tictactoeBoxes = ref<TicTacToeBox[]>([]);
+for (let i = 0; i < 9; i++) {
+    tictactoeBoxes.value.push(new TicTacToeBox(false, ""));
+}
+
+defineEmits(["placeMarker"]);
 </script>
+
 <template>
     <div class="tictactoe-container">
-        <div class="tictactoe-box" v-for="(TicTacToeBox, index) in tictactoeBoxes" :key="index" @click=placeMarker(index) :class="TicTacToeBox.marker"></div>
+        <div 
+            v-for="(TicTacToeBox, index) in tictactoeBoxes" 
+            :key="index" @click="() => $emit('placeMarker', index, TicTacToeBox)" 
+            :class="TicTacToeBox.marker"
+            class="tictactoe-box"   
+        ></div>
     </div>
 </template>
+
 <style scoped>
     .tictactoe-container {
         display: flex;
