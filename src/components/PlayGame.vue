@@ -1,20 +1,40 @@
 <script setup lang="ts">
 import { TicTacToeBox } from '../models/TicTacToeBox';
-import Players from './Players.vue';
-import TicTacToe from './TicTacToe.vue';
 import { Player } from '../models/Player';
 import { ref } from "vue";
+import Players from './Players.vue';
+import TicTacToe from './TicTacToe.vue';
+import { WinCombo } from '../models/WinCombo';
 
-const players = ref<Player[]>([
-    {name:"Player X", wins: 0, marker: "x", playing: false},
-    {name:"Player O", wins: 0, marker: "o", playing: true}
+
+const markedBoxes = ref<TicTacToeBox[]>([]);
+
+const winCombos = ref<WinCombo[]>([
+    {combo: [0, 1, 2], id: 1},
+    {combo: [0, 4, 8], id: 2},
+    {combo: [0, 3, 6], id: 3},
+    {combo: [6, 7, 8], id: 4},
+    {combo: [2, 5, 8], id: 5},
+    {combo: [6, 4, 2], id: 6},
+    {combo: [1, 4, 7], id: 7},
+    {combo: [3, 4, 5], id: 8},
 ]);
 
-const placeMarker = (i: number, tictactoeBox: TicTacToeBox) => {
-    const player = isPlaying();
+const players = ref<Player[]>([
+    {name:"Player X", wins: 0, marker: "x", playing: false, boxesClicked:[]},
+    {name:"Player O", wins: 0, marker: "o", playing: true, boxesClicked:[]}
+]);
+
+const placeMarker = (tictactoeBox: TicTacToeBox) => {
+    const isplaying = players.value.findIndex(player => player.playing === true);
+    const player = players.value[isplaying];
+
     if (!tictactoeBox.marked) {
         tictactoeBox.marked = true;
-        tictactoeBox.marker = player?.marker || "";
+        tictactoeBox.marker = player.marker;
+        markedBoxes.value.push(tictactoeBox)
+        saveResult(player);
+        checkResult(player);
         switchPlayer(); 
     }    
 } 
@@ -25,14 +45,22 @@ const switchPlayer = () => {
     }
 }
 
-const isPlaying = () => {
-    for(let i = 0; i < players.value.length; i++) {
-        if (players.value[i].playing) {
-            return players.value[i]
-        }
+
+const saveResult = (player: Player) => {
+    for ( let i = 0; i < markedBoxes.value.length; i++ ) {
+        markedBoxes.value[i].marker === player.marker ? player.boxesClicked.push(markedBoxes.value[i].id) : "" ;
     }
 }
 
+const checkResult = (player: Player) => {
+    for(let i = 0; i < winCombos.value.length; i++) {
+        let combo = winCombos.value[i].combo;
+        const playerWon = combo.every(combo => {
+            return player.boxesClicked.includes(combo);
+        });
+        playerWon ? console.log("player won!") : "";
+    }
+}
 
 </script>
 <template>

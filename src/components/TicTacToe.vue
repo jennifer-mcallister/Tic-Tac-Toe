@@ -4,8 +4,9 @@ import { TicTacToeBox } from "../models/TicTacToeBox";
 
 const tictactoeBoxes = ref<TicTacToeBox[]>([]);
 for (let i = 0; i < 9; i++) {
-    tictactoeBoxes.value.push(new TicTacToeBox(false, ""));
+    tictactoeBoxes.value.push(new TicTacToeBox(false, "", i));
 }
+
 
 defineEmits(["placeMarker"]);
 </script>
@@ -14,9 +15,10 @@ defineEmits(["placeMarker"]);
     <div class="tictactoe-container">
         <div 
             v-for="(TicTacToeBox, index) in tictactoeBoxes" 
-            :key="index" @click="() => $emit('placeMarker', index, TicTacToeBox)" 
+            :key="index" @click="() => $emit('placeMarker', TicTacToeBox)" 
             :class="TicTacToeBox.marker"
-            class="tictactoe-box"   
+            class="tictactoe-box"  
+            
         ></div>
     </div>
 </template>
