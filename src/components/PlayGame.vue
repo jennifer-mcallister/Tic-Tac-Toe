@@ -8,6 +8,12 @@ import { WinCombo } from '../models/WinCombo';
 import { ResetTicTacToe } from '../models/ResetTicTacToe'
 import ShowResult from './ShowResult.vue';
 
+interface IPlayGameProps {
+    playerX: "";
+    playerO: "";
+}
+
+const props = defineProps<IPlayGameProps>();
 
 let resetTicTacToe = ref<ResetTicTacToe>({reset: false})
 let showResults = ref(false);
@@ -28,9 +34,11 @@ const winCombos = ref<WinCombo[]>([
 ]);
 
 const players = ref<Player[]>([
-    {name:"Player X", wins: 0, marker: "x", playing: false, boxesClicked:[]},
-    {name:"Player O", wins: 0, marker: "o", playing: true, boxesClicked:[]}
+    {name:props.playerX, wins: 0, marker: "x", playing: false, boxesClicked:[]},
+    {name:props.playerO, wins: 0, marker: "o", playing: true, boxesClicked:[]}
 ]);
+
+let winningPlayer = ref(players.value[0]);
 
 const placeMarker = (tictactoeBox: TicTacToeBox) => {
     const isplaying = players.value.findIndex(player => player.playing === true);
@@ -67,19 +75,18 @@ const checkResult = (player: Player) => {
         });
        
         playerWon ? player.wins  = player.wins + 1 : player.wins;
+        winningPlayer.value = player;
         playerWon ? showResult() : checkIfAllBoxesAreMarked() ;
     }
 }
 
 const checkIfAllBoxesAreMarked = () => {
     if( markedBoxes.value.length === 9) {
-        console.log("all boxes are marked")
         showResult ();
     }
 }
 
 const showResult = () => {
-    console.log("next round started");
     showResults.value = true;
 }
 
@@ -98,7 +105,7 @@ const newRound = () => {
 
 </script>
 <template>
-    <ShowResult v-show="showResults" @click="newRound"></ShowResult>
+    <ShowResult :winningPlayer="winningPlayer" v-show="showResults" @click="newRound"></ShowResult>
     <Players class="player" :player="player" v-for="player in players" :class="player.playing ? '' : 'hide'"></Players>
     <TicTacToe :reset="resetTicTacToe" @place-marker="placeMarker" />  
 </template>

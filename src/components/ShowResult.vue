@@ -2,10 +2,16 @@
 import { Player } from '../models/Player';
 
 
+interface IShowResultProps {
+    winningPlayer: Player
+}
+
+defineProps<IShowResultProps>();
 </script>
 
 <template>
-    <div class="container"> Won!</div>
+    <div class="container"> {{ winningPlayer.name }} Won!</div>
+    <!-- <div class="container"> You both lose.. </div> -->
 </template>
 
 <style scoped>
