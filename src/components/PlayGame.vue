@@ -5,6 +5,13 @@ import { ref } from "vue";
 import Players from './Players.vue';
 import TicTacToe from './TicTacToe.vue';
 import { WinCombo } from '../models/WinCombo';
+import { ResetTicTacToe } from '../models/ResetTicTacToe'
+import ShowResult from './ShowResult.vue';
+
+
+let resetTicTacToe = ref<ResetTicTacToe>({reset: false})
+let showResults = ref(false);
+
 
 
 const markedBoxes = ref<TicTacToeBox[]>([]);
@@ -33,7 +40,7 @@ const placeMarker = (tictactoeBox: TicTacToeBox) => {
         tictactoeBox.marked = true;
         tictactoeBox.marker = player.marker;
         markedBoxes.value.push(tictactoeBox)
-        saveResult(player);
+        saveMarking(player);
         checkResult(player);
         switchPlayer(); 
     }    
@@ -46,7 +53,7 @@ const switchPlayer = () => {
 }
 
 
-const saveResult = (player: Player) => {
+const saveMarking = (player: Player) => {
     for ( let i = 0; i < markedBoxes.value.length; i++ ) {
         markedBoxes.value[i].marker === player.marker ? player.boxesClicked.push(markedBoxes.value[i].id) : "" ;
     }
@@ -58,12 +65,41 @@ const checkResult = (player: Player) => {
         const playerWon = combo.every(combo => {
             return player.boxesClicked.includes(combo);
         });
-        playerWon ? console.log("player won!") : "";
+       
+        playerWon ? player.wins  = player.wins + 1 : player.wins;
+        playerWon ? showResult() : checkIfAllBoxesAreMarked() ;
     }
 }
 
+const checkIfAllBoxesAreMarked = () => {
+    if( markedBoxes.value.length === 9) {
+        console.log("all boxes are marked")
+        showResult ();
+    }
+}
+
+const showResult = () => {
+    console.log("next round started");
+    showResults.value = true;
+}
+
+const newRound = () => {
+    for (let i = 0; i < players.value.length; i++) {
+        players.value[i].boxesClicked = [];
+    }
+    markedBoxes.value = [];
+    showResults.value = false;
+    resetTicTacToe.value.reset = true;
+    resetTicTacToe.value.reset = false;
+    
+}
+
+
+
 </script>
 <template>
+    <ShowResult v-show="showResults" @click="newRound"></ShowResult>
     <Players class="player" :player="player" v-for="player in players" :class="player.playing ? '' : 'hide'"></Players>
-    <TicTacToe @place-marker="placeMarker" />
+    <TicTacToe :reset="resetTicTacToe" @place-marker="placeMarker" />  
 </template>
+

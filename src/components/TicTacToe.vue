@@ -1,6 +1,21 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { TicTacToeBox } from "../models/TicTacToeBox";
+import { ResetTicTacToe } from "../models/ResetTicTacToe";
+
+interface IResetTicTacToe {
+    reset: ResetTicTacToe
+}
+const props = defineProps<IResetTicTacToe>();
+
+watch(props.reset, ()=> {
+    console.log("reset");
+    for (let i = 0; i < tictactoeBoxes.value.length; i++) {
+        tictactoeBoxes.value[i].marked = false;
+        tictactoeBoxes.value[i].marker = "";
+    }
+})
+
 
 const tictactoeBoxes = ref<TicTacToeBox[]>([]);
 for (let i = 0; i < 9; i++) {
