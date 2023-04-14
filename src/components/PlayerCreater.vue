@@ -13,9 +13,11 @@ const startGame = () => {
 </script>
 <template>
     <div class="container">
-        <input type="text" v-model="playerX" name="playerX" placeholder="Player X name..">
-        <input type="text" v-model="playerO" name="playerO" placeholder="Player O name..">
-        <button type="button" @click="startGame">Start</button>
+        <form @submit.prevent="startGame">
+            <input type="text" v-model="playerX" name="playerX" placeholder="Player X name.." required>
+            <input type="text" v-model="playerO" name="playerO" placeholder="Player O name.." required>
+            <button type="submit">Start</button>
+        </form>
     </div>
 </template>
 <style scoped>

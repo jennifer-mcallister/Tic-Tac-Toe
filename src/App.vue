@@ -18,7 +18,7 @@ const startGame = (playerX: string, playerO: string) => {
 
 <template>
   <PlayerCreater v-if="show" @start-game="startGame"></PlayerCreater>
-  <PlayGame v-else :playerX="playerNameX" :playerO="playerNameO" ></PlayGame>
+  <PlayGame v-else :playerX="playerNameX.value" :playerO="playerNameO.value" ></PlayGame>
 </template>
 
 <style scoped>
