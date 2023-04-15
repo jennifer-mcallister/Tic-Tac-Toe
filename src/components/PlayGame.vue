@@ -13,9 +13,10 @@ interface IPlayGameProps {
     playerO: "";
 }
 
+const draw = ref(false);
 const props = defineProps<IPlayGameProps>();
 
-let resetTicTacToe = ref<ResetTicTacToe>({reset: false})
+let resetTicTacToe = ref<ResetTicTacToe>({reset: false});
 let showResults = ref(false);
 
 
@@ -82,6 +83,7 @@ const checkResult = (player: Player) => {
 
 const checkIfAllBoxesAreMarked = () => {
     if( markedBoxes.value.length === 9) {
+        draw.value = true;
         showResult ();
     }
 }
@@ -96,17 +98,28 @@ const newRound = () => {
     }
     markedBoxes.value = [];
     showResults.value = false;
+    draw.value = false;
     resetTicTacToe.value.reset = true;
     resetTicTacToe.value.reset = false;
     
 }
 
+const saveInLocalStorage = () => {
+    localStorage.setItem("players", JSON.stringify(players));
+    localStorage.setItem("markedBoxes", JSON.stringify(markedBoxes));
+}
 
 
+defineEmits(["startNewGame"]);
 </script>
 <template>
-    <ShowResult :winningPlayer="winningPlayer" v-show="showResults" @click="newRound"></ShowResult>
+    <ShowResult :winningPlayer="winningPlayer" :draw="draw" v-show="showResults" @click="newRound"></ShowResult>
     <Players class="player" :player="player" v-for="player in players" :class="player.playing ? '' : 'hide'"></Players>
     <TicTacToe :reset="resetTicTacToe" @place-marker="placeMarker" />  
+    <button type="button" @click="() => $emit('startNewGame')" >Start New Game</button>
 </template>
-
+<style scoped>
+button {
+    margin: 2rem;
+}
+</style>

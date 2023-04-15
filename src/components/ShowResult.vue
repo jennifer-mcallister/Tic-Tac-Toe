@@ -4,14 +4,16 @@ import { Player } from '../models/Player';
 
 interface IShowResultProps {
     winningPlayer: Player
+    draw: boolean
 }
 
-defineProps<IShowResultProps>();
+
+const props = defineProps<IShowResultProps>();
 </script>
 
 <template>
-    <div class="container"> {{ winningPlayer.name }} Won!</div>
-    <!-- <div class="container"> You both lose.. </div> -->
+    <div class="container" v-if="!props.draw"> {{ winningPlayer.name }} Won!</div>
+    <div class="container" v-else> You both lose.. </div>
 </template>
 
 <style scoped>
@@ -21,7 +23,7 @@ defineProps<IShowResultProps>();
         justify-content: center;
         align-items: center;
 
-        height: 20rem;
+        height: 50vw;
         width: 30rem;
         margin: 0;
         padding: 0;

@@ -14,11 +14,15 @@ const startGame = (playerX: string, playerO: string) => {
    playerNameO.value = playerO;
 }
 
+const restart = () => {
+  show.value = true;
+}
+
 </script>
 
 <template>
   <PlayerCreater v-if="show" @start-game="startGame"></PlayerCreater>
-  <PlayGame v-else :playerX="playerNameX.value" :playerO="playerNameO.value" ></PlayGame>
+  <PlayGame v-else :playerX="playerNameX.value" :playerO="playerNameO.value" @start-new-game="restart"></PlayGame>
 </template>
 
 <style scoped>
