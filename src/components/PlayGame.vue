@@ -1,27 +1,24 @@
 <script setup lang="ts">
 import { TicTacToeBox } from '../models/TicTacToeBox';
 import { Player } from '../models/Player';
+import { WinCombo } from '../models/WinCombo';
 import { ref } from "vue";
 import Players from './Players.vue';
 import TicTacToe from './TicTacToe.vue';
-import { WinCombo } from '../models/WinCombo';
-import { ResetTicTacToe } from '../models/ResetTicTacToe'
 import ShowResult from './ShowResult.vue';
 
 interface IPlayGameProps {
-    playerX: "";
-    playerO: "";
+    players: Player[];
 }
-
-const draw = ref(false);
 const props = defineProps<IPlayGameProps>();
+const players = ref<Player[]>(props.players);
 
-let resetTicTacToe = ref<ResetTicTacToe>({reset: false});
-let showResults = ref(false);
-
-
-
-const markedBoxes = ref<TicTacToeBox[]>([]);
+const tictactoeBoxes = ref<TicTacToeBox[]>((JSON.parse(localStorage.getItem("ticTacToeBoxes") || "[]")));
+if (tictactoeBoxes.value.length < 1) {
+    for (let i = 0; i < 9; i++) {
+    tictactoeBoxes.value.push(new TicTacToeBox(false, "", i));
+    }
+}
 
 const winCombos = ref<WinCombo[]>([
     {combo: [0, 1, 2], id: 1},
@@ -34,24 +31,23 @@ const winCombos = ref<WinCombo[]>([
     {combo: [3, 4, 5], id: 8},
 ]);
 
-const players = ref<Player[]>([
-    {name:props.playerX, wins: 0, marker: "x", playing: false, boxesClicked:[]},
-    {name:props.playerO, wins: 0, marker: "o", playing: true, boxesClicked:[]}
-]);
-
+const draw = ref(false);
+let showResults = ref(false);
 let winningPlayer = ref(players.value[0]);
 
-const placeMarker = (tictactoeBox: TicTacToeBox) => {
+const placeMarker = (i: number) => {
+    draw.value = false; 
     const isplaying = players.value.findIndex(player => player.playing === true);
     const player = players.value[isplaying];
 
-    if (!tictactoeBox.marked) {
-        tictactoeBox.marked = true;
-        tictactoeBox.marker = player.marker;
-        markedBoxes.value.push(tictactoeBox)
-        saveMarking(player);
+    if (!tictactoeBoxes.value[i].marked) {
+        tictactoeBoxes.value[i].marked = true;
+        tictactoeBoxes.value[i].marker = player.marker;
+        saveMarking(player, tictactoeBoxes.value[i]);
         checkResult(player);
+        checkIfAllBoxesAreMarked();
         switchPlayer(); 
+        saveInLocalStorage(); 
     }    
 } 
 
@@ -61,65 +57,91 @@ const switchPlayer = () => {
     }
 }
 
-
-const saveMarking = (player: Player) => {
-    for ( let i = 0; i < markedBoxes.value.length; i++ ) {
-        markedBoxes.value[i].marker === player.marker ? player.boxesClicked.push(markedBoxes.value[i].id) : "" ;
-    }
+const saveMarking = (player: Player, tictactoeBox: TicTacToeBox) => {
+    player.boxesClicked.push(tictactoeBox.id)
 }
 
 const checkResult = (player: Player) => {
+    let playerWon = false;
     for(let i = 0; i < winCombos.value.length; i++) {
         let combo = winCombos.value[i].combo;
-        const playerWon = combo.every(combo => {
+        playerWon = combo.every(combo => {
             return player.boxesClicked.includes(combo);
         });
-       
         playerWon ? player.wins  = player.wins + 1 : player.wins;
         winningPlayer.value = player;
-        playerWon ? showResult() : checkIfAllBoxesAreMarked() ;
-    }
+        playerWon ? newRound() : "";   
+    }   
 }
 
 const checkIfAllBoxesAreMarked = () => {
-    if( markedBoxes.value.length === 9) {
+    let markedBoxes = 0;
+    for (let i = 0; i < tictactoeBoxes.value.length; i++) {
+        if (tictactoeBoxes.value[i].marked) {
+            markedBoxes += 1;
+        }
+    }
+    if (markedBoxes === 9) {
         draw.value = true;
-        showResult ();
+        newRound();
     }
 }
 
-const showResult = () => {
-    showResults.value = true;
+const toggleShowResult= () => {
+    showResults.value = !showResults.value;  
 }
 
 const newRound = () => {
+    toggleShowResult();
     for (let i = 0; i < players.value.length; i++) {
         players.value[i].boxesClicked = [];
     }
-    markedBoxes.value = [];
-    showResults.value = false;
-    draw.value = false;
-    resetTicTacToe.value.reset = true;
-    resetTicTacToe.value.reset = false;
-    
+    for (let i = 0; i < tictactoeBoxes.value.length; i++) {
+        tictactoeBoxes.value[i].marked = false;
+        tictactoeBoxes.value[i].marker = "";
+    } 
+    localStorage.setItem("ticTacToeBoxes", JSON.stringify(tictactoeBoxes.value))
+    tictactoeBoxes.value = (JSON.parse(localStorage.getItem("ticTacToeBoxes") || "[]"));
 }
 
 const saveInLocalStorage = () => {
-    localStorage.setItem("players", JSON.stringify(players));
-    localStorage.setItem("markedBoxes", JSON.stringify(markedBoxes));
+    localStorage.setItem("players", JSON.stringify(players.value));
+    localStorage.setItem("ticTacToeBoxes", JSON.stringify(tictactoeBoxes.value));
 }
 
-
-defineEmits(["startNewGame"]);
+const emit = defineEmits(["startNewGame"]);
+const startNewGame = () => {
+    for (let i = 0; i < tictactoeBoxes.value.length; i++) {
+        tictactoeBoxes.value[i].marked = false;
+        tictactoeBoxes.value[i].marker = "";
+    }
+    for(let i = 0; i < players.value.length; i++) {
+        players.value[i].wins = 0;
+    }
+    emit("startNewGame", tictactoeBoxes.value)
+}
 </script>
 <template>
-    <ShowResult :winningPlayer="winningPlayer" :draw="draw" v-show="showResults" @click="newRound"></ShowResult>
+    <ShowResult :winningPlayer="winningPlayer" :draw="draw" v-show="showResults" @click="toggleShowResult"></ShowResult>
     <Players class="player" :player="player" v-for="player in players" :class="player.playing ? '' : 'hide'"></Players>
-    <TicTacToe :reset="resetTicTacToe" @place-marker="placeMarker" />  
-    <button type="button" @click="() => $emit('startNewGame')" >Start New Game</button>
+    <div class="tictactoe-container">
+        <TicTacToe :ticTacToeBox="tictactoeBox" v-for="(tictactoeBox, index) in tictactoeBoxes" @click="placeMarker(index)" />  
+    </div>
+    <button type="button" @click="startNewGame" >Start New Game</button>
 </template>
 <style scoped>
 button {
     margin: 2rem;
 }
+
+.tictactoe-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        background-color: white;
+
+        width: 30rem;
+        height: 30rem;
+    }
 </style>

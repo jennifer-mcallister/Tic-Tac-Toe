@@ -1,55 +1,18 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
 import { TicTacToeBox } from "../models/TicTacToeBox";
-import { ResetTicTacToe } from "../models/ResetTicTacToe";
 
-interface IResetTicTacToe {
-    reset: ResetTicTacToe
+interface ITicTacToeProps {
+    ticTacToeBox: TicTacToeBox;
 }
-const props = defineProps<IResetTicTacToe>();
+const props = defineProps<ITicTacToeProps>();
 
-watch(props.reset, ()=> {
-    console.log("reset");
-    for (let i = 0; i < tictactoeBoxes.value.length; i++) {
-        tictactoeBoxes.value[i].marked = false;
-        tictactoeBoxes.value[i].marker = "";
-    }
-})
-
-
-const tictactoeBoxes = ref<TicTacToeBox[]>([]);
-for (let i = 0; i < 9; i++) {
-    tictactoeBoxes.value.push(new TicTacToeBox(false, "", i));
-}
-
-
-defineEmits(["placeMarker"]);
 </script>
 
 <template>
-    <div class="tictactoe-container">
-        <div 
-            v-for="(TicTacToeBox, index) in tictactoeBoxes" 
-            :key="index" @click="() => $emit('placeMarker', TicTacToeBox)" 
-            :class="TicTacToeBox.marker"
-            class="tictactoe-box"  
-            
-        ></div>
-    </div>
+    <div :class="props.ticTacToeBox.marker" class="tictactoe-box" ></div>
 </template>
 
 <style scoped>
-    .tictactoe-container {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-
-        background-color: white;
-
-        width: 30rem;
-        height: 30rem;
-    }
-
     .tictactoe-box {
         width: 10rem;
         height: 10rem;

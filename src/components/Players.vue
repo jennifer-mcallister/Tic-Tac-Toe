@@ -5,7 +5,6 @@ interface IPlayerProps {
     player: Player;
 }
 defineProps<IPlayerProps>();
-
 </script>
 
 <template>

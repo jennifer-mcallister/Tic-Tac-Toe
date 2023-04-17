@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-let playerX = ref("X");
-let playerO = ref("O");
+let playerX = ref("");
+let playerO = ref("");
 
 const emit = defineEmits(["startGame"]);
 const startGame = () => {
     emit("startGame", playerX, playerO);
 };
-
 
 </script>
 <template>

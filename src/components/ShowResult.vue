@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { Player } from '../models/Player';
 
-
 interface IShowResultProps {
     winningPlayer: Player
     draw: boolean
 }
-
 
 const props = defineProps<IShowResultProps>();
 </script>

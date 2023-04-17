@@ -1,29 +1,58 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import PlayGame from './components/PlayGame.vue';
 import PlayerCreater from './components/PlayerCreater.vue';
+import Loader from './components/Loader.vue';
+import { Player } from './models/Player';
+import { TicTacToeBox } from './models/TicTacToeBox';
 
-let show = ref(true);
-let playerNameX = ref();
-let playerNameO = ref();
+let startingApp = ref(true);
+let continueGame = false;
+let showGame = ref(true);
+let players = ref<Player[]>((JSON.parse(localStorage.getItem("players") || "[]")));
 
+if (players.value.length > 0) {
+  continueGame = true;
+} else {
+  players.value = ([
+    {name:"", wins: 0, marker: "x", playing: false, boxesClicked:[]},
+    {name:"", wins: 0, marker: "o", playing: true, boxesClicked:[]}
+  ])
+}
 
 const startGame = (playerX: string, playerO: string) => {
-  show.value = false;
-   playerNameX.value = playerX; 
-   playerNameO.value = playerO;
+  showGame.value = false;
+  players.value[0].name = playerX; 
+  players.value[1].name = playerO;
+  localStorage.setItem("players", JSON.stringify(players.value))
 }
 
-const restart = () => {
-  show.value = true;
+const restart = (ticTacToeBoxes: TicTacToeBox[]) => {
+  resetLocalStorage(ticTacToeBoxes);
+  showGame.value = true;
 }
+
+const resetLocalStorage = (tictactoeBoxes: TicTacToeBox[]) => {
+  localStorage.setItem("players", JSON.stringify(""));
+  localStorage.setItem("ticTacToeBoxes", JSON.stringify(tictactoeBoxes));
+}
+
+onMounted(() => {
+  continueGame ? showGame.value = false : showGame.value = true;
+  setTimeout(() => {
+    startingApp.value = false;
+  }, 3000)
+})
 
 </script>
 
 <template>
-  <PlayerCreater v-if="show" @start-game="startGame"></PlayerCreater>
-  <PlayGame v-else :playerX="playerNameX.value" :playerO="playerNameO.value" @start-new-game="restart"></PlayGame>
-</template>
+  <Loader v-if="startingApp"></Loader>
+  <div class="game" v-else>
+    <PlayerCreater v-if="showGame" @start-game="startGame"></PlayerCreater>
+    <PlayGame v-else :players="players" @start-new-game="restart"></PlayGame>
+  </div>
+  </template>
 
 <style scoped>
 .logo {
