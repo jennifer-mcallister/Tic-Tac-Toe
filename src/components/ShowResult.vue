@@ -21,12 +21,13 @@ const props = defineProps<IShowResultProps>();
         justify-content: center;
         align-items: center;
 
-        height: 50vw;
-        width: 30rem;
+        height: 100%;
+        width: 100%;
         margin: 0;
         padding: 0;
 
         color: red;
         background-color: rgba(0, 0, 0, 0.863);
+        font-size: 3em;
     }
 </style>

@@ -123,7 +123,9 @@ const startNewGame = () => {
 </script>
 <template>
     <ShowResult :winningPlayer="winningPlayer" :draw="draw" v-show="showResults" @click="toggleShowResult"></ShowResult>
-    <Players class="player" :player="player" v-for="player in players" :class="player.playing ? '' : 'hide'"></Players>
+    <div class="players-container">
+        <Players class="player" :player="player" v-for="player in players" :class="player.playing ? '' : 'hide'"></Players>
+    </div>
     <div class="tictactoe-container">
         <TicTacToe :ticTacToeBox="tictactoeBox" v-for="(tictactoeBox, index) in tictactoeBoxes" @click="placeMarker(index)" />  
     </div>
@@ -138,10 +140,16 @@ button {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-
-        background-color: white;
+        padding: 1em;
 
         width: 30rem;
         height: 30rem;
     }
+.players-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 </style>

@@ -9,25 +9,36 @@ const props = defineProps<ITicTacToeProps>();
 </script>
 
 <template>
-    <div :class="props.ticTacToeBox.marker" class="tictactoe-box" ></div>
+    <div :class="props.ticTacToeBox.marker, props.ticTacToeBox.marked ? '' : 'active' " class="tictactoe-box" >
+        <p>{{ props.ticTacToeBox.marker }}</p>
+    </div>
 </template>
 
 <style scoped>
+    .active {
+        cursor: pointer;
+    }
+
+    .active:hover {
+        background-color: rgb(10, 10, 10);
+    }
     .tictactoe-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 10rem;
         height: 10rem;
 
         box-sizing: border-box;
-        border: 1px solid black;
-        color: black;
-        font-size: 5rem;
+        border: 3px solid rgb(46, 46, 46);
+        color: red;
+        font-size: 8rem;
+
+        background-color: black;
     }
 
-    .x {
-        background-color: cadetblue;
+    .x, .o {
+        cursor: default;
     }
 
-    .o {
-        background-color: darksalmon;
-    }
 </style>

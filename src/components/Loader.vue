@@ -23,7 +23,7 @@
     .dot {
         height: 40px;
         width: 40px;
-        color: greenyellow;
+        color: red;
         background-size: cover;
         border-radius: 100%;
         animation: loading 2s ease-out infinite;
